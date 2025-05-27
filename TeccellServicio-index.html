@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TECCELL SERVICIO | Reservar servicio técnico</title>
+  <link rel="shortcut icon" href="teccell.png" type="image/x-icon">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+  <link rel="stylesheet" href="teccell-style.css">
+  <style>
+    .step { display: none; }
+    .step.active { display: block; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>TECCELL SERVICIO</h1>
+    <p>Reserva tu cita con Junior Galarreta</p>
+  </header>
+
+  <main>
+    <form id="formulario">
+
+      <!-- Paso 1 -->
+      <div class="step active" id="paso1">
+        <h2>1. Seleccione el servicio</h2>
+
+        <label for="servicio">Tipo de servicio:</label>
+        <select id="servicio" required onchange="mostrarCampoOtro(this.value)">
+          <option value="">Seleccione...</option>
+          <option>Cambio de pantalla</option>
+          <option>Cambio de batería</option>
+          <option>Reparación de puerto de carga</option>
+          <option>Solución de software</option>
+          <option>Reparación de TV LED</option>
+          <option>Otro</option>
+        </select>
+
+        <!-- Campo adicional para “Otro” -->
+        <div id="campoOtro" style="display:none; margin-top:10px;">
+          <label for="otroServicio">Describa su problema:</label>
+          <input type="text" id="otroServicio" placeholder="Ej. El parlante no funciona..." />
+        </div>
+
+        <label for="equipo">Equipo:</label>
+        <input type="text" id="equipo" placeholder="Ej. Samsung A32, iPhone 11" required>
+
+        <label for="fecha">Fecha deseada:</label>
+        <input type="date" id="fecha" required>
+
+        <label for="hora">Hora (Desde / Hasta):</label>
+        <div class="time-group">
+          <input type="time" id="desde" required>
+          <input type="time" id="hasta" required>
+        </div>
+
+        <label for="tecnico">Técnico:</label>
+        <input type="text" id="tecnico" value="Junior Galarreta" disabled>
+
+        <button type="button" class="button" onclick="mostrarPaso2()">Siguiente</button>
+      </div>
+
+      <!-- Paso 2 -->
+      <div class="step" id="paso2">
+        <h2>2. Ingrese sus datos</h2>
+
+        <label for="nombre">Nombre completo:</label>
+        <input type="text" id="nombre" required>
+
+        <label for="telefono">Teléfono:</label>
+        <input type="tel" id="telefono" required>
+
+        <label for="comentario">Comentario adicional:</label>
+        <textarea id="comentario" rows="4" placeholder="Ej. El celular no enciende..."></textarea>
+
+        <div class="summary">
+          <strong>Resumen:</strong>
+          <p id="resumenDatos"></p>
+        </div>
+
+        <button type="submit" class="button">Enviar por WhatsApp</button>
+      </div>
+
+    </form>
+  </main>
+
+  <script>
+    function mostrarCampoOtro(valor) {
+      const campo = document.getElementById('campoOtro');
+      const input = document.getElementById('otroServicio');
+
+      if (valor === 'Otro') {
+        campo.style.display = 'block';
+        input.required = true;
+      } else {
+        campo.style.display = 'none';
+        input.required = false;
+        input.value = '';
+      }
+    }
+
+    function mostrarPaso2() {
+      let servicio = document.getElementById('servicio').value;
+      const otro = document.getElementById('otroServicio').value.trim();
+      const equipo = document.getElementById('equipo').value;
+      const fecha = document.getElementById('fecha').value;
+      const desde = document.getElementById('desde').value;
+      const hasta = document.getElementById('hasta').value;
+
+      if (!servicio || !equipo || !fecha || !desde || !hasta || (servicio === 'Otro' && !otro)) {
+        alert("Por favor, complete todos los campos del paso 1.");
+        return;
+      }
+
+      if (servicio === 'Otro') {
+        servicio = otro;
+      }
+
+      document.getElementById('paso1').classList.remove('active');
+      document.getElementById('paso2').classList.add('active');
+
+      const resumen = `
+        Servicio: ${servicio}<br>
+        Equipo: ${equipo}<br>
+        Fecha: ${fecha}<br>
+        Horario: ${desde} - ${hasta}<br>
+        Técnico: Junior Galarreta`;
+
+      document.getElementById('resumenDatos').innerHTML = resumen;
+    }
+
+    document.getElementById('formulario').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const nombre = document.getElementById('nombre').value;
+      const telefono = document.getElementById('telefono').value;
+      const comentario = document.getElementById('comentario').value;
+
+      let servicio = document.getElementById('servicio').value;
+      const otro = document.getElementById('otroServicio').value.trim();
+      if (servicio === 'Otro') {
+        servicio = otro;
+      }
+
+      const equipo = document.getElementById('equipo').value;
+      const fecha = document.getElementById('fecha').value;
+      const desde = document.getElementById('desde').value;
+      const hasta = document.getElementById('hasta').value;
+
+      const mensaje = `Hola, soy ${nombre}.\nDeseo solicitar el siguiente servicio:\n\n` +
+        `*Servicio:* ${servicio}\n` +
+        `*Equipo:* ${equipo}\n` +
+        `*Fecha:* ${fecha}\n` +
+        `*Horario:* ${desde} - ${hasta}\n` +
+        `*Comentario:* ${comentario || 'Sin comentarios.'}\n` +
+        `*Teléfono:* ${telefono}`;
+
+      const whatsappURL = `https://wa.me/+51917199252?text=${encodeURIComponent(mensaje)}`;
+      window.open(whatsappURL, '_blank');
+    });
+  </script>
+
+  <footer>
+    <p>&copy; 2024 JUNIOR GALERRETA. TODOS LOS DERECHOS RESERVADOS.</p>
+  </footer>
+</body>
+</html>
